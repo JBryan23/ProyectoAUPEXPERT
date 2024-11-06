@@ -1,0 +1,28 @@
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.AssemblyInfoInputs.cache
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.AssemblyInfo.cs
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.csproj.CoreCompileInputs.cache
+C:\Users\jhons\Desktop\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.exe
+C:\Users\jhons\Desktop\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.deps.json
+C:\Users\jhons\Desktop\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.runtimeconfig.json
+C:\Users\jhons\Desktop\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.dll
+C:\Users\jhons\Desktop\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.pdb
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.dll
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\refint\SistemaExpertoAup.dll
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.pdb
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.genruntimeconfig.cache
+C:\Users\jhons\Desktop\SistemaExperto\obj\Debug\net8.0\ref\SistemaExpertoAup.dll
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.exe
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.deps.json
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.runtimeconfig.json
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.dll
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\bin\Debug\net8.0\SistemaExpertoAup.pdb
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.AssemblyInfoInputs.cache
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.AssemblyInfo.cs
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.dll
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\refint\SistemaExpertoAup.dll
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.pdb
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\SistemaExpertoAup.genruntimeconfig.cache
+C:\Users\Usuario\Downloads\SistemaExperto (1)\SistemaExperto\obj\Debug\net8.0\ref\SistemaExpertoAup.dll

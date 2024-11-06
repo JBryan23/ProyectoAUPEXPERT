@@ -1,0 +1,91 @@
+﻿@inherits LayoutComponentBase
+
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+@* <MudLayout>
+    <MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
+    <MudThemeManager Open="_themeManagerOpen" OpenChanged="OpenThemeManager" Theme="_themeManager" ThemeChanged="UpdateTheme" />
+</MudLayout> *@
+
+<MudLayout style="height: 100vh;">
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Rounded.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h5" Class="ml-3">AUPExpert</MudText>
+        <MudSpacer />
+        @*<MudAvatar Color="Color.Default" Variant="Variant.Filled">
+            <MudIcon Icon="@Icons.Material.Rounded.Person"  Color="Color.Primary"/>
+        </MudAvatar>*@
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu/>
+    </MudDrawer>
+    <MudMainContent Style="height: 100%;">
+        <div class="d-flex flex-grow-1 flex-column" style="height:100%;">
+            <MudPaper Class="flex-initial d-flex" Width="max-content" Elevation="0">
+                <MudBreadcrumbs Items="Routes" MaxItems="3"></MudBreadcrumbs>
+            </MudPaper>
+            <MudPaper Class="flex-initial d-flex justify-center align-center" Width="100%" Height="90%" Elevation="0">
+                <CascadingValue TValue="List<BreadcrumbItem>" Value="@Routes">
+                    @Body
+                </CascadingValue>
+            </MudPaper>
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+<MudLayout id="blazor-error-ui">
+    An unhandled error has occurred.
+    <MudLink Href="" Class="reload">Reload</MudLink>
+    <MudLink Class="dismiss">🗙</MudLink>
+</MudLayout>
+
+
+@code {
+    #region navegacion
+    public static List<BreadcrumbItem> Routes = new();
+    // {
+    //     new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
+    //     new BreadcrumbItem("Videos", href: "#", icon: Icons.Material.Filled.VideoLibrary),
+    //     new BreadcrumbItem("Create", href: null, disabled: true, icon: Icons.Material.Filled.Create)
+    // };
+    #endregion
+
+    #region menu lateral
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;    
+    }
+    #endregion
+
+
+    #region temas
+    private ThemeManagerTheme _themeManager = new ThemeManagerTheme();
+    public bool _themeManagerOpen = false;
+
+    void OpenThemeManager(bool value)
+    {
+        _themeManagerOpen = value;
+    }
+
+    void UpdateTheme(ThemeManagerTheme value)
+    {
+        _themeManager = value;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        StateHasChanged();
+    }
+    #endregion
+}

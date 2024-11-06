@@ -1,0 +1,65 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\AUPExpert.Service.WebUI.bundle.scp.css",
+      "PackagePath": "staticwebassets\\AUPExpert.Service.WebUI.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\img\\home\\crear-proyecto.svg",
+      "PackagePath": "staticwebassets\\img\\home\\crear-proyecto.svg"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\img\\home\\tus-proyectos.svg",
+      "PackagePath": "staticwebassets\\img\\home\\tus-proyectos.svg"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\img\\phases\\fase-construccion.svg",
+      "PackagePath": "staticwebassets\\img\\phases\\fase-construccion.svg"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\img\\phases\\fase-elaboracion.svg",
+      "PackagePath": "staticwebassets\\img\\phases\\fase-elaboracion.svg"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\img\\phases\\fase-inicio.svg",
+      "PackagePath": "staticwebassets\\img\\phases\\fase-inicio.svg"
+    },
+    {
+      "Id": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Service.WebUI\\wwwroot\\img\\phases\\fase-transicion.svg",
+      "PackagePath": "staticwebassets\\img\\phases\\fase-transicion.svg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.AUPExpert.Service.WebUI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.AUPExpert.Service.WebUI.props",
+      "PackagePath": "build\\AUPExpert.Service.WebUI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.AUPExpert.Service.WebUI.props",
+      "PackagePath": "buildMultiTargeting\\AUPExpert.Service.WebUI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.AUPExpert.Service.WebUI.props",
+      "PackagePath": "buildTransitive\\AUPExpert.Service.WebUI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

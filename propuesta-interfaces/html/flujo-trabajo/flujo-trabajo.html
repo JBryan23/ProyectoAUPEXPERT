@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujo de Trabajo</title>
+    <link rel="stylesheet" href="flujo-trabajo.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Gestión de Flujos de Trabajo</h1>
+        <form id="workflow-form">
+            <label for="workflow-name">Nombre del flujo de trabajo</label>
+            <input type="text" id="workflow-name" name="workflow-name" placeholder="Ingrese el nombre del flujo de trabajo" required>
+            
+            <label for="workflow-description">Descripción del flujo de trabajo</label>
+            <textarea id="workflow-description" name="workflow-description" rows="4" placeholder="Ingrese la descripción del flujo de trabajo" required></textarea>
+
+            <button type="submit">Guardar</button>
+        </form>
+
+        <table id="workflow-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre del flujo de trabajo</th>
+                    <th>Descripción del flujo de trabajo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se insertarán las filas dinámicamente con JavaScript -->
+                <tr>
+                    <td>1</td>
+                    <td>Flujo de Ejemplo</td>
+                    <td>Descripción del flujo de trabajo de ejemplo</td>
+                    <td class="action-buttons">
+                        <button class="edit-btn">Editar</button>
+                        <button class="delete-btn">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Aquí podrías implementar la lógica con JavaScript para manejar los datos
+        // en la tabla, los botones de editar y eliminar, y la inserción de nuevos flujos de trabajo.
+    </script>
+</body>
+</html>

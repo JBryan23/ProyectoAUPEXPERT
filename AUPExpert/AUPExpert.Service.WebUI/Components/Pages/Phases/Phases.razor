@@ -1,0 +1,219 @@
+﻿@page "/Phases/phases"
+@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Services.Projects
+
+@inject ProjectService _projectService
+
+<PageTitle>Proyectos - AUPExpert</PageTitle>
+
+<MudStack Row="true" Class="pa-6" Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="6" Style="height:100%;">
+    <MudPaper Class="pa-3 rounded-xl" Style="@($"background:{Colors.DeepPurple.Lighten5};")" Width="300px" Height="300px">
+        <div class="d-flex justify-center">
+            <MudImage ObjectFit="ObjectFit.Contain" Height="200" Width="200" Src="img/phases/fase-inicio.svg" Alt="Fase de Inicio" Elevation="0" Class="rounded-lg mt-3" />
+        </div>
+        <MudStack Row Justify="Justify.SpaceBetween">
+            @if (ProjectDto is not null && ProjectDto.InitialPhaseCompleted)
+            {
+                <MudTooltip Text="Fase como Completada" Placement="Placement.Right" >
+                    <MudIconButton Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Success" Size="Size.Large"  />
+                </MudTooltip>
+            }
+            else
+            {
+                <MudTooltip Text="Marcar fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Inherit" Size="Size.Large" OnClick="async()=> await FinishProjectPhaseAsync(ProjectId, PhaseDto.INICIO)" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Ir a la fase de Inicio" Placement="Placement.Top">
+                <MudButton Class="mt-3 rounded-xl" Variant="Variant.Filled" StartIcon="@Icons.Material.Rounded.Start" Color="Color.Primary" IconColor="Color.Inherit" Size="Size.Large" FullWidth="true" OnClick="()=>GoToPhase(PhaseDto.INICIO, ProjectId)">INICIO</MudButton>
+            </MudTooltip>
+        </MudStack>
+    </MudPaper>
+    <MudPaper Class="pa-3 rounded-xl" Style="@($"background:{Colors.DeepPurple.Lighten5};")" Width="300px" Height="300px">
+        <div class="d-flex justify-center">
+            <MudImage ObjectFit="ObjectFit.Contain" Height="200" Width="200" Src="img/phases/fase-elaboracion.svg" Alt="Fase de Elaboración" Elevation="0" Class="rounded-lg mt-3" />
+        </div>
+        <MudStack Row Justify="Justify.SpaceBetween">
+            @if (ProjectDto is not null && ProjectDto.ElaborationPhaseCompleted)
+            {
+                <MudTooltip Text="Fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Success" Size="Size.Large"  />
+                </MudTooltip>
+            }
+            else
+            {
+                <MudTooltip Text="Marcar fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Disabled="@((ProjectDto is not null && !ProjectDto.InitialPhaseCompleted))" Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Inherit" Size="Size.Large" OnClick="async()=> await FinishProjectPhaseAsync(ProjectId, PhaseDto.ELABORACION)" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Ir a la fase de Elaboración" Placement="Placement.Top">
+                <MudButton Class="mt-3 rounded-xl" Variant="Variant.Filled" StartIcon="@Icons.Material.Rounded.Analytics" Color="Color.Primary" IconColor="Color.Inherit" Size="Size.Large" FullWidth="true" OnClick="()=>GoToPhase(PhaseDto.ELABORACION, ProjectId)"
+                           Disabled="@((ProjectDto is not null && !ProjectDto.InitialPhaseCompleted))">ELABORACIÓN</MudButton>
+            </MudTooltip>
+        </MudStack>
+    </MudPaper>
+    <MudPaper Class="pa-3 rounded-xl" Style="@($"background:{Colors.DeepPurple.Lighten5};")" Width="300px" Height="300px">
+        <div class="d-flex justify-center">
+            <MudImage ObjectFit="ObjectFit.Contain" Height="200" Width="200" Src="img/phases/fase-construccion.svg" Alt="Fase de Construcción" Elevation="0" Class="rounded-lg mt-3" />
+        </div>
+        <MudStack Row Justify="Justify.SpaceBetween">
+            @if (ProjectDto is not null && ProjectDto.ConstructionPhaseCompleted)
+            {
+                <MudTooltip Text="Fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Success" Size="Size.Large"/>
+                </MudTooltip>
+            }else{
+                <MudTooltip Text="Marcar fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Disabled="@((ProjectDto is not null && !ProjectDto.ElaborationPhaseCompleted))" Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Inherit" Size="Size.Large" OnClick="async()=> await FinishProjectPhaseAsync(ProjectId, PhaseDto.CONSTRUCCION)" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Ir a la fase de Construcción" Placement="Placement.Top">
+                <MudButton  Class="mt-3 rounded-xl" Variant="Variant.Filled" StartIcon="@Icons.Material.Rounded.Engineering" Color="Color.Primary" IconColor="Color.Inherit" Size="Size.Large" FullWidth="true" OnClick="()=>GoToPhase(PhaseDto.CONSTRUCCION, ProjectId)"
+                           Disabled="@((ProjectDto is not null && !ProjectDto.ElaborationPhaseCompleted))">CONSTRUCCIÓN</MudButton>
+            </MudTooltip>
+        </MudStack>
+    </MudPaper>
+    <MudPaper Class="pa-3 rounded-xl" Style="@($"background:{Colors.DeepPurple.Lighten5};")" Width="300px" Height="300px">
+        <div class="d-flex justify-center">
+            <MudImage ObjectFit="ObjectFit.Contain" Height="200" Width="200" Src="img/phases/fase-transicion.svg" Alt="Fase de Transición" Elevation="0" Class="rounded-lg mt-3" />
+        </div>
+        <MudStack Row Justify="Justify.SpaceBetween">
+            @if (ProjectDto is not null && ProjectDto.TransitionPhaseCompleted)
+            {
+                <MudTooltip Text="Fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Success" Size="Size.Large" />
+                </MudTooltip>
+            }else{
+                <MudTooltip Text="Marcar fase como Completada" Placement="Placement.Right">
+                    <MudIconButton Disabled="@((ProjectDto is not null && !ProjectDto.ConstructionPhaseCompleted))" Class="mt-3 rounded-xl" Variant="Variant.Filled" Icon="@Icons.Material.Rounded.TaskAlt" Color="Color.Inherit" Size="Size.Large" OnClick="async()=> await FinishProjectPhaseAsync(ProjectId, PhaseDto.TRANSICION)" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Ir a la fase de Transición" Placement="Placement.Top">
+                <MudButton Class="mt-3 rounded-xl" Variant="Variant.Filled" StartIcon="@Icons.Material.Rounded.WorkHistory" Color="Color.Primary" IconColor="Color.Inherit" Size="Size.Large" FullWidth="true" OnClick="()=>GoToPhase(PhaseDto.TRANSICION, ProjectId)"
+                           Disabled="@((ProjectDto is not null && !ProjectDto.ConstructionPhaseCompleted))">TRANSICIÓN</MudButton>
+            </MudTooltip>
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    public int ProjectId { get; set; }
+    public ProjectDto ProjectDto { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetValuesFromQueryString();
+        LoadNavegationRoutes();
+        await LoadProyectDataAsync();
+        await base.OnInitializedAsync();
+    }
+
+    #region crud
+    private async Task LoadProyectDataAsync()
+    {
+        var response = await _projectService.GetAsync(ProjectId);
+        if (response.IsSuccess)
+        {
+            ProjectDto = response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ENCONTRAR PROYECTO]", response.Message, response.Errors);
+        }
+    }
+
+    private async Task FinishProjectPhaseAsync(int projectId, PhaseDto phaseDto)
+    {
+
+        var result = await _customDialogService.ShowSimpleGenericDialogAsync("[FINALIZAR FASE DE PROYECTO]",
+        $"¿Realmente desea finalizar la fase de proyecto '{phaseDto}'? Previamente deben estar completadas todas las iteraciones de la fase.", "Finalizar", Color.Success);
+        if (result)
+        {
+            var canComplete = await CanCompletePhaseAsync(projectId, phaseDto);
+            if (canComplete)
+            {
+                var response = await _projectService.UpdateAsync(projectId, AddCompletedPhase(phaseDto, ProjectDto));
+                if (response.IsSuccess)
+                {
+                    _snackbar.Add(response.Message, Severity.Success);
+                    await LoadProyectDataAsync();
+                }
+                else
+                {
+                    await _customDialogService.ShowErrorDialogAsync("[FINALIZAR FASE]", response.Message, response.Errors);
+                }
+            }
+        }
+        
+    }
+
+    private async Task<bool> CanCompletePhaseAsync(int projectId, PhaseDto phaseDto)
+    {
+        var canCompleteResult = await _projectService.CanCompletePhaseAsync(projectId, phaseDto);
+        if (!canCompleteResult.IsSuccess)
+        {
+              await _customDialogService.ShowErrorDialogAsync("[FINALIZAR FASE]", canCompleteResult.Message, canCompleteResult.Errors);
+        }
+        return canCompleteResult.Data;
+    }
+
+    private ProjectDto AddCompletedPhase(PhaseDto phaseDto, ProjectDto projectDto)
+    {
+        switch (phaseDto)
+        {
+            case PhaseDto.INICIO:
+                projectDto.InitialPhaseCompleted = true;
+                break;
+            case PhaseDto.ELABORACION:
+                projectDto.ElaborationPhaseCompleted = true;
+                break;
+            case PhaseDto.CONSTRUCCION:
+                projectDto.ConstructionPhaseCompleted = true;
+                break;
+            default:
+                projectDto.TransitionPhaseCompleted = true;
+                break;
+        }
+        return projectDto;
+    }
+    #endregion
+
+    #region navegacion
+    private void LoadNavegationRoutes()
+    {
+        if (!Routes.Exists(x => x.Href!.Equals($"/Phases/phases?ProjectId={ProjectId}")))
+        {
+            Routes.Add(new BreadcrumbItem(
+                text: "Fases", href: $"/Phases/phases?ProjectId={ProjectId}", icon: Icons.Material.Rounded.ViewCompactAlt
+            ));
+        }
+        else
+        {
+            var route = Routes.Find(x => x.Href!.Equals($"/Phases/phases?ProjectId={ProjectId}"));
+            if (route is not null)
+            {
+                var routeIndex = Routes.IndexOf(route);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex) - 1);
+            }
+        }
+    }
+    #endregion
+    private void GetValuesFromQueryString()
+    {
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("ProjectId", out var proyectId))
+        {
+            ProjectId = int.Parse(proyectId);
+        }
+    }
+    #region rutas
+    private void GoToPhase(PhaseDto PhaseId, int projectId)
+    {
+        _navigationManager.NavigateTo($"/Iterations/iterations?PhaseId={(int)PhaseId}&ProjectId={projectId}", true, true);
+    }
+    #endregion
+}

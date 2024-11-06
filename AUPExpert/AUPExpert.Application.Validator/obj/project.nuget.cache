@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "M5eVeFHWY/QwfnT4JuMQTDj2XlOy78r3T1JPE7407DCGAsoW7SnXb65PtiVLFxm4BrfcZw4It5LfePxb8PbKqA==",
+  "success": true,
+  "projectFilePath": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Application.Validator\\AUPExpert.Application.Validator.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Usuario\\.nuget\\packages\\fluentvalidation\\11.10.0\\fluentvalidation.11.10.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.10.0\\fluentvalidation.dependencyinjectionextensions.11.10.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\2.1.0\\microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,65 @@
+/* Estilos generales de la sección de fases */
+.main-content {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.main-content h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 40px;
+}
+
+/* Contenedor de las fases */
+.phases-container {
+    display: flex;
+    justify-content: center; /* Centra los elementos horizontalmente */
+    gap: 40px; /* Espacio entre las fases */
+    flex-wrap: wrap; /* Permite que las fases se ajusten en múltiples líneas si es necesario */
+}
+
+/* Estilos de cada fase individual */
+.phase {
+    text-align: center;
+    border: 2px solid #ccc; /* Borde alrededor de la fase */
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f9f9f9; /* Fondo claro */
+    width: 350px; /* Ajusta el ancho del bloque */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    transition: transform 0.3s ease;
+}
+
+/* Efecto de hover para las fases */
+.phase:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón */
+}
+
+/* Estilo de la imagen dentro de la fase */
+.phase-img {
+    margin-bottom: 20px;
+}
+
+.phase-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Hace que las imágenes sean redondas */
+    object-fit: cover;
+    border: 2px solid #007bff; /* Borde alrededor de la imagen */
+    background-color: #ddd; /* Fondo para cuando no haya imagen */
+}
+
+/* Botón de fase */
+.phase-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.phase-btn:hover {
+    background-color: #0056b3;
+}

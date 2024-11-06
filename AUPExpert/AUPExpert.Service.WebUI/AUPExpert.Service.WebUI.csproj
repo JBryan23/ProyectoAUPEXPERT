@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>36f6d2c5-de84-4074-a1d7-ece9722673ea</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="MudBlazor" Version="7.14.0" />
+    <PackageReference Include="MudBlazor.ThemeManager" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AUPExpert.Application.DTO\AUPExpert.Application.DTO.csproj" />
+    <ProjectReference Include="..\AUPExpert.Application.Interface\AUPExpert.Application.Interface.csproj" />
+    <ProjectReference Include="..\AUPExpert.Application.UseCases\AUPExpert.Application.UseCases.csproj" />
+    <ProjectReference Include="..\AUPExpert.Common\AUPExpert.Common.csproj" />
+  </ItemGroup>
+
+</Project>

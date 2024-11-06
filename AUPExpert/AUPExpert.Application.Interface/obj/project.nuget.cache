@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZwvAhPOWENHnAGvCazJsKfOZL5hweiQ9fG11CF9HDlTl6zi/zQP6IiS+yMS+L0iujXkPc5ehCB0Thd8ZfGYsdw==",
+  "success": true,
+  "projectFilePath": "C:\\Universidad UNAB\\Ciclo 06\\Sistemas Expertos\\AUP\\AUPExpert\\AUPExpert\\AUPExpert.Application.Interface\\AUPExpert.Application.Interface.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Usuario\\.nuget\\packages\\fluentvalidation\\11.10.0\\fluentvalidation.11.10.0.nupkg.sha512"
+  ],
+  "logs": []
+}

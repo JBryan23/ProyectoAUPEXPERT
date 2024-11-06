@@ -1,0 +1,512 @@
+﻿@page "/tasks"
+@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Components.Pages.aupexpert_assistant
+@using AUPExpert.Service.WebUI.Services.Iterations
+@using AUPExpert.Service.WebUI.Services.WorkFlowTasks
+@using AUPExpert.Service.WebUI.Services.WorkFlows
+
+@inject WorkFlowService _workFlowService
+@inject WorkFlowTaskService _workFlowTaskService
+@inject IterationService _iterationService
+
+
+<PageTitle>Tareas</PageTitle>
+<MudGrid Class="pa-3 overflow-scroll" id="tasks" Style="height:100%;" Justify="Justify.Center">
+    <MudItem xs="12" sm="6" md="6" lg="4" Style="height:100%;">
+        <MudPaper Class="pa-6 d-flex flex-column justify-start mud-height-full mud-elevation-3 ">
+            <MudStack Class="mud-width-full" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6" Color="Color.Primary">PENDIENTES</MudText>
+                <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                    <MudText Align="Align.Center" Class="mud-theme-info rounded pa-1">@FilterOneTotalTasks/@TotalTasks</MudText>
+                    <MudText Align="Align.Center" Class="mud-theme-primary rounded pa-1">
+                        @if(TotalTasks > 0)
+                        {
+                            @(Math.Round(((decimal)FilterOneTotalTasks / TotalTasks)*100, 2) + "%")
+                        }
+                    </MudText>
+                </MudStack>
+            </MudStack>
+            <MudStack Class="overflow-y-auto mt-3 mb-3" Style="height:stretch;">
+                <MudTextField Class="border mt-3" T="string" Label="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true" TextChanged="async(value)=> await SearchAsync(WorkFlowTaskStateDto.PENDIENTE, value)"/>
+                <MudExpansionPanels Outlined="false" Elevation="1" MultiExpansion="true">
+                    @foreach (var workFlow in WorkFlows)
+                    {
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <div class="d-flex justify-space-between align-center">
+                                    <MudTooltip Text="@workFlow.Description">
+                                        <MudText Class="mt-1" >@workFlow.Name</MudText>
+                                    </MudTooltip>
+                                    <MudStack Class="mr-1" Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                                        <MudText Align="Align.Center" Class="mud-theme-info rounded pa-1">@FilterOneTasks.Where(x=>x.WorkFlowId.Equals(workFlow.Id)).Count()/@FilterOneTotalTasks</MudText>
+                                    </MudStack>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                @foreach (var task in FilterOneTasks.Where(x=>x.WorkFlowId.Equals(workFlow.Id)))
+                                {
+                                    <div class="d-flex justify-space-between align-center ma-1">
+                                        <MudTooltip Text="@task.Description" Placement="Placement.Top">
+                                            <MudText Class="mt-1" Typo="Typo.caption">- @task.Name</MudText>
+                                        </MudTooltip>
+                                        <MudStack Class="mr-1" Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                                            @if (task.Priority.Equals(PriorityDto.ALTA)) {
+                                                <MudTooltip Text="Tarea de ALTA PRIORIDAD.">
+                                                    <MudIconButton Icon="@Icons.Material.Rounded.KeyboardDoubleArrowUp" Color="Color.Error" />
+                                                </MudTooltip>
+                                            }
+                                            else if (task.Priority.Equals(PriorityDto.MEDIA))
+                                            {
+                                                <MudTooltip Text="Tarea de MEDIA PRIORIDAD">
+                                                    <MudIconButton Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Warning" />
+                                                </MudTooltip>
+                                            }
+                                            else{}
+                                            @if (IterationDto is not null && IterationDto.State.Equals(IterationStateDto.PENDIENTE))
+                                            {
+                                                <MudMenu Icon="@Icons.Material.Filled.ArrowRight"
+                                                         Color="Color.Primary" ActivationEvent="MouseEvent.MouseOver" TransformOrigin="Origin.TopRight"
+                                                         AriaLabel="Open user menu">
+                                                    <MudTooltip Text="Indicar que esta tarea se ha comenzado a trabajar." Placement="Placement.Top">
+                                                        <MudMenuItem OnClick="async()=> await UpdateStateAsync(WorkFlowTaskStateDto.INICIADA, task)">Comenzar Tarea</MudMenuItem>
+                                                    </MudTooltip>
+                                                    <MudMenuItem>
+                                                        <MudToolBar Class="pa-0 ma-0">
+                                                            <MudTooltip Text="Editar tarea">
+                                                                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Color="Color.Warning" OnClick="async()=> await OpenWorkFlowTaskFormAsync(task.Id)" />
+                                                            </MudTooltip>
+                                                            <MudTooltip Text="Eliminar tarea">
+                                                                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="async()=> await DeleteWorkFlowTaskAsync(task.Id, task.Name)" />
+                                                            </MudTooltip>
+                                                        </MudToolBar>
+                                                    </MudMenuItem>
+                                                </MudMenu>
+                                            }
+                                        </MudStack>
+                                    </div>
+                                }
+                            </ChildContent>
+                    </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            </MudStack>
+            @if (IterationDto is not null && IterationDto.State.Equals(IterationStateDto.PENDIENTE))
+            {
+                <MudButton OnClick="@(async() => await OpenWorkFlowTaskFormAsync(0))" StartIcon="@Icons.Material.Filled.Add" FullWidth="true" Class="rounded-lg py-2">Agregar Tarea</MudButton>
+            }
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="6" lg="4" Style="height:100%;">
+        <MudPaper Class="pa-6 d-flex flex-column justify-start mud-height-full mud-elevation-3 ">
+            <MudStack Class="mud-width-full" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6" Color="Color.Primary">INICIADAS</MudText>
+                <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                    <MudText Align="Align.Center" Class="mud-theme-info rounded pa-1">@FilterTwoTotalTasks/@TotalTasks</MudText>
+                    <MudText Align="Align.Center" Class="mud-theme-primary rounded pa-1">
+                        @if (TotalTasks > 0)
+                        {
+                            @(Math.Round(((decimal)FilterTwoTotalTasks / TotalTasks) * 100, 2) + "%")
+                        }
+                    </MudText>
+                </MudStack>
+            </MudStack>
+            <MudStack Class="overflow-y-auto mt-3 mb-3" Style="height:stretch;">
+                <MudTextField Class="border mt-3" T="string" Label="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true" TextChanged="async(value)=> await SearchAsync(WorkFlowTaskStateDto.INICIADA, value)" />
+                <MudExpansionPanels Outlined="false" Elevation="1" MultiExpansion="true">
+                    @foreach (var workFlow in WorkFlows)
+                    {
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <div class="d-flex justify-space-between align-center">
+                                    <MudTooltip Text="@workFlow.Description">
+                                        <MudText Class="mt-1">@workFlow.Name</MudText>
+                                    </MudTooltip>
+                                    <MudStack Class="mr-1" Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                                        <MudText Align="Align.Center" Class="mud-theme-info rounded pa-1">@FilterTwoTasks.Where(x => x.WorkFlowId.Equals(workFlow.Id)).Count()/@FilterTwoTotalTasks</MudText>
+                                    </MudStack>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                @foreach (var task in FilterTwoTasks.Where(x => x.WorkFlowId.Equals(workFlow.Id)))
+                                {
+                                    <div class="d-flex justify-space-between align-center ma-1">
+                                        <MudTooltip Text="@task.Description" Placement="Placement.Top">
+                                            <MudText Class="mt-1" Typo="Typo.caption">- @task.Name</MudText>
+                                        </MudTooltip>
+                                        <MudStack Class="mr-1" Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                                            @if (task.Priority.Equals(PriorityDto.ALTA))
+                                            {
+                                                <MudTooltip Text="Tarea de ALTA PRIORIDAD.">
+                                                    <MudIconButton Icon="@Icons.Material.Rounded.KeyboardDoubleArrowUp" Color="Color.Error" />
+                                                </MudTooltip>
+                                            }
+                                            else if (task.Priority.Equals(PriorityDto.MEDIA))
+                                            {
+                                                <MudTooltip Text="Tarea de MEDIA PRIORIDAD">
+                                                    <MudIconButton Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Warning" />
+                                                </MudTooltip>
+                                            }
+                                            else { }
+                                            @if (IterationDto is not null && IterationDto.State.Equals(IterationStateDto.PENDIENTE))
+                                            {
+                                                <MudMenu Icon="@Icons.Material.Filled.ArrowRight"
+                                                         Color="Color.Primary" ActivationEvent="MouseEvent.MouseOver" TransformOrigin="Origin.TopRight"
+                                                         AriaLabel="Open user menu">
+                                                    <MudTooltip Text="Indica que esta tarea vuelve a estar pendiente de trabajarse." Placement="Placement.Top">
+                                                        <MudMenuItem OnClick="async()=> await UpdateStateAsync(WorkFlowTaskStateDto.PENDIENTE, task)">Volver a Pendiente</MudMenuItem>
+                                                    </MudTooltip>
+                                                    <MudTooltip Text="Indicar que esta tarea se ha finalizado." Placement="Placement.Top">
+                                                        <MudMenuItem OnClick="async()=> await UpdateStateAsync(WorkFlowTaskStateDto.FINALIZADA, task)">Finalizar Tarea</MudMenuItem>
+                                                    </MudTooltip>
+                                                </MudMenu>
+                                            }
+                                        </MudStack>
+                                    </div>
+                                }
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="6" lg="4" Style="height:100%;">
+        <MudPaper Class="pa-6 d-flex flex-column justify-start mud-height-full mud-elevation-3 ">
+            <MudStack Class="mud-width-full" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6" Color="Color.Primary">FINALIZADAS</MudText>
+                <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                    <MudText Align="Align.Center" Class="mud-theme-info rounded pa-1">@FilterThreeTotalTasks/@TotalTasks</MudText>
+                    <MudText Align="Align.Center" Class="mud-theme-primary rounded pa-1">
+                        @if (TotalTasks > 0)
+                        {
+                            @(Math.Round(((decimal)FilterThreeTotalTasks / TotalTasks) * 100, 2) + "%")
+                        }
+                    </MudText>
+                </MudStack>
+            </MudStack>
+            <MudStack Class="overflow-y-auto mt-3 mb-3" Style="height:stretch;">
+                <MudTextField Class="border mt-3" T="string" Label="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true" TextChanged="async(value)=> await SearchAsync(WorkFlowTaskStateDto.FINALIZADA, value)" />
+                <MudExpansionPanels Outlined="false" Elevation="1" MultiExpansion="true">
+                    @foreach (var workFlow in WorkFlows)
+                    {
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <div class="d-flex justify-space-between align-center">
+                                    <MudTooltip Text="@workFlow.Description">
+                                        <MudText Class="mt-1">@workFlow.Name</MudText>
+                                    </MudTooltip>
+                                    <MudStack Class="mr-1" Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                                        <MudText Align="Align.Center" Class="mud-theme-info rounded pa-1">@FilterThreeTasks.Where(x => x.WorkFlowId.Equals(workFlow.Id)).Count()/@FilterThreeTotalTasks</MudText>
+                                    </MudStack>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                @foreach (var task in FilterThreeTasks.Where(x => x.WorkFlowId.Equals(workFlow.Id)))
+                                {
+                                    <div class="d-flex justify-space-between align-center ma-1">
+                                        <MudTooltip Text="@task.Description" Placement="Placement.Top">
+                                            <MudText Class="mt-1" Typo="Typo.caption">- @task.Name</MudText>
+                                        </MudTooltip>
+                                        <MudStack Class="mr-1" Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                                            @if (task.Priority.Equals(PriorityDto.ALTA))
+                                            {
+                                                <MudTooltip Text="Tarea de ALTA PRIORIDAD.">
+                                                    <MudIconButton Icon="@Icons.Material.Rounded.KeyboardDoubleArrowUp" Color="Color.Error" />
+                                                </MudTooltip>
+                                            }
+                                            else if (task.Priority.Equals(PriorityDto.MEDIA))
+                                            {
+                                                <MudTooltip Text="Tarea de MEDIA PRIORIDAD">
+                                                    <MudIconButton Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Warning" />
+                                                </MudTooltip>
+                                            }
+                                            else { }
+                                            @if (IterationDto is not null && IterationDto.State.Equals(IterationStateDto.PENDIENTE))
+                                            {
+                                                <MudMenu Icon="@Icons.Material.Filled.ArrowRight"
+                                                Color="Color.Primary" ActivationEvent="MouseEvent.MouseOver" TransformOrigin="Origin.TopRight"
+                                                AriaLabel="Open user menu">
+                                                    <MudTooltip Text="Indica que esta tarea vuelve a estar en proceso de trabajo." Placement="Placement.Top">
+                                                        <MudMenuItem OnClick="async()=> await UpdateStateAsync(WorkFlowTaskStateDto.INICIADA, task)">Volver a Iniciada</MudMenuItem>
+                                                    </MudTooltip>
+                                                </MudMenu>
+                                            }
+                                        </MudStack>
+                                    </div>
+                                }
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    @if (IterationDto is not null && IterationDto.State.Equals(IterationStateDto.PENDIENTE))
+    {
+        <MudScrollToTop TopOffset="0"
+                        Selector="#tasks"
+                        VisibleCssClass="visible absolute"
+                        HiddenCssClass="invisible"
+                        Visible="true" OnClick="async() => await OpenAssistantAsync()">
+            <MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" Label="@assistantButtonText" />
+        </MudScrollToTop>
+    }
+</MudGrid>
+@code {
+    private IEnumerable<WorkFlowDto> WorkFlows { get; set; } = [];
+    private IEnumerable<WorkFlowTaskDto> Tasks { get; set; } = [];
+
+    private IEnumerable<WorkFlowTaskDto> FilterOneTasks { get; set; } = [];
+    private IEnumerable<WorkFlowTaskDto> FilterTwoTasks { get; set; } = [];
+    private IEnumerable<WorkFlowTaskDto> FilterThreeTasks { get; set; } = [];
+
+    //conteo
+    private int TotalTasks { get; set; }
+    private int FilterOneTotalTasks { get; set; }
+    private int FilterTwoTotalTasks { get; set; }
+    private int FilterThreeTotalTasks { get; set; }
+
+    private int IterationId { get; set; }
+    private IterationDto IterationDto { get; set; }
+    private int ProjectId { get; set; }
+
+    private string assistantButtonText = "Asistente AUPExpert";
+
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadAllDataAsync();
+    }
+    private async Task LoadAllDataAsync()
+    {
+        GetValuesFromQueryString();
+        LoadNavegationRoutes();
+        await LoadWorkFlowsAsync();
+        await LoadWorkFlowsTasksByIterationAsync();
+        await DefaultFiltersForTasksAsync();
+        await LoadCountersAsync();
+        await GetIterationAsync();
+        await Task.CompletedTask;
+    }
+    private void GetValuesFromQueryString()
+    {
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("IterationId", out var iterationId))
+        {
+            IterationId = int.Parse(iterationId);
+        }
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("ProjectId", out var projectId))
+        {
+            ProjectId = int.Parse(projectId);
+        }
+    }
+
+    private void LoadNavegationRoutes()
+    {
+        var route = $"/tasks?IterationId={IterationId}&ProjectId={ProjectId}";
+        if (!Routes.Exists(x => x.Href!.Equals(route)))
+        {
+            Routes.Add(new BreadcrumbItem(
+                text: "Tareas", href: route, icon: Icons.Material.Rounded.Task
+            ));
+        }
+        else
+        {
+            var routeExist = Routes.Find(x => x.Href!.Equals(route));
+            if (routeExist is not null)
+            {
+                var routeIndex = Routes.IndexOf(routeExist);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex) - 1);
+            }
+        }
+    }
+
+    private async Task SearchAsync(WorkFlowTaskStateDto workFlowTaskStateDto, string searchString)
+    {
+        await DefaultFiltersForTasksAsync();
+        switch (workFlowTaskStateDto)
+        {
+            case WorkFlowTaskStateDto.PENDIENTE:
+                FilterOneTasks = FilterOneTasks.Where(x => x.Name.ToLower().Contains(searchString.ToLower()));
+                break;
+            case WorkFlowTaskStateDto.INICIADA:
+                FilterTwoTasks = FilterTwoTasks.Where(x => x.Name.ToLower().Contains(searchString.ToLower()));
+                break;
+            default:
+                FilterThreeTasks = FilterThreeTasks.Where(x => x.Name.ToLower().Contains(searchString.ToLower()));
+                break;
+        }
+        await Task.CompletedTask;
+    }
+
+    #region crud
+    private async Task LoadWorkFlowsAsync()
+    {
+        var response = await _workFlowService.GetAllByProjectAsync(ProjectId);
+        if (response.IsSuccess)
+        {
+            WorkFlows = response.Data ?? [];
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[MOSTRAR FLUJOS DE TRABAJO]", response.Message, response.Errors);
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task GetIterationAsync()
+    {
+        var response = await _iterationService.GetAsync(IterationId);
+        if (response.IsSuccess)
+        {
+            IterationDto = response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[BUSCAR ITERACIÓN]", response.Message, response.Errors);
+        }
+    }
+
+    private async Task LoadWorkFlowsTasksByIterationAsync()
+    {
+        var response = await _workFlowTaskService.GetAllByIterationAsync(IterationId);
+        if (response.IsSuccess)
+        {
+            Tasks = response.Data ?? [];
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[MOSTRAR TAREAS]", response.Message, response.Errors);
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task DefaultFiltersForTasksAsync()
+    {
+        FilterOneTasks = Tasks.Where(x => x.State.Equals(WorkFlowTaskStateDto.PENDIENTE));
+        FilterTwoTasks = Tasks.Where(x => x.State.Equals(WorkFlowTaskStateDto.INICIADA));
+        FilterThreeTasks = Tasks.Where(x => x.State.Equals(WorkFlowTaskStateDto.FINALIZADA));
+        await Task.CompletedTask;
+    }
+
+    private async Task LoadCountersAsync()
+    {
+        TotalTasks = Tasks.Count();
+
+        FilterOneTotalTasks = FilterOneTasks.Count();
+        FilterTwoTotalTasks = FilterTwoTasks.Count();
+        FilterThreeTotalTasks = FilterThreeTasks.Count();
+
+        await Task.CompletedTask;
+    }
+
+    private async Task OpenWorkFlowTaskFormAsync(int workFlowTaskId)
+    {
+        var task = new WorkFlowTaskDto { Id = workFlowTaskId, IterationId = IterationId };
+
+        var parameters = new DialogParameters<WorkFlowTaskForm>
+        {
+            { p => p.workFlowTaskDto, task},
+            { p => p.ProjectId, ProjectId}
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = false,
+            CloseOnEscapeKey = true,
+            NoHeader = true
+
+        };
+
+        var dialog = await _dialogService.ShowAsync<WorkFlowTaskForm>("Formulario de Tarea", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled && (bool)result.Data)
+        {
+            await LoadWorkFlowsTasksByIterationAsync();
+            await DefaultFiltersForTasksAsync();
+            await LoadCountersAsync();
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task DeleteWorkFlowTaskAsync(int taskId, string name)
+    {
+        var result = await _customDialogService.ShowSimpleGenericDialogAsync("[ELIMINAR TAREA]",
+        $"¿Realmente desea eliminar esta tarea '{name}'? Este proceso no es reversible.", "Eliminar", Color.Error);
+        if (result)
+        {
+            var response = await _workFlowTaskService.DeleteAsync(taskId);
+            if (response.IsSuccess)
+            {
+                _snackbar.Add(response.Message, Severity.Success);
+                var task = Tasks.ToList();
+                task.RemoveAll(x => x.Id == taskId);
+                Tasks = task.AsEnumerable();
+                await DefaultFiltersForTasksAsync();
+                await LoadCountersAsync();
+            }
+            else
+            {
+                await _customDialogService.ShowErrorDialogAsync("[ELIMINAR TAREA]", response.Message, response.Errors);
+            }
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task UpdateStateAsync(WorkFlowTaskStateDto workFlowTaskStateDto, WorkFlowTaskDto workFlowTaskDto)
+    {
+        workFlowTaskDto.State = workFlowTaskStateDto;
+        var response = await _workFlowTaskService.UpdateAsync(workFlowTaskDto.Id, workFlowTaskDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            await DefaultFiltersForTasksAsync();
+            await LoadCountersAsync();
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ACTUALIZAR ESTADO DE TAREA]", response.Message, response.Errors);
+            await LoadAllDataAsync();
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region chat
+    private async Task OpenAssistantAsync()
+    {
+        assistantButtonText = "Conversando ...";
+        var parameters = new DialogParameters<Assistant>
+        {
+            {p => p.WorkFlows, WorkFlows},
+            {p => p.IterationId, IterationId},
+            {p => p.AddedWorkFlowsTasks, Tasks}
+        };
+        var options = new DialogOptions
+            {
+                CloseButton = false,
+                CloseOnEscapeKey = true,
+                MaxWidth=MaxWidth.Medium,
+                NoHeader = false
+
+            };
+
+        var dialog = await _dialogService.ShowAsync<Assistant>("Asistente AUPExpert",parameters, options);
+        var result = await dialog.Result;
+        if (result.Canceled)
+        {
+            await LoadWorkFlowsTasksByIterationAsync();
+            await DefaultFiltersForTasksAsync();
+            await LoadCountersAsync();
+        }
+        assistantButtonText = "Asistente AUPExpert";
+        await Task.CompletedTask;
+    }
+    #endregion
+}

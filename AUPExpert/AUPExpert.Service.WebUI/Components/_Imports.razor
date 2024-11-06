@@ -1,0 +1,25 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using AUPExpert.Service.WebUI.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using AUPExpert.Service.WebUI
+@using AUPExpert.Service.WebUI.Components
+
+@*Para obtener datos pasador por query string como el navigation manajer*@
+@using Microsoft.AspNetCore.WebUtilities
+
+@*Uso global para los componentes de MudBlazor*@
+@using MudBlazor
+@using MudBlazor.ThemeManager
+
+@*Permite navegar entre paginas*@
+@inject NavigationManager _navigationManager
+@inject CustomDialogService _customDialogService
+@inject ISnackbar _snackbar
+@inject IDialogService _dialogService
+

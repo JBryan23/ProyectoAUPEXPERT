@@ -1,0 +1,194 @@
+﻿@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Services.WorkFlowTasks
+@using System.ComponentModel.DataAnnotations
+@using AUPExpert.Service.WebUI.Services.WorkFlows
+
+@inject WorkFlowTaskService _workFlowTaskService
+@inject WorkFlowService _workFlowService
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Class="pa-6" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height:100%;">
+            <MudGrid>
+                <MudItem xs="12" sm="12">
+                    <MudPaper Class="pa-4" Elevation="0">
+                        <MudForm Model="workFlowTaskDto" @ref="form" @bind-IsValid="@success" Spacing="6">
+                            <MudText Typo="Typo.h6" Align="Align.Center">Tarea</MudText>
+
+                            <MudTextField T="string" Label="Nombre" @bind-Value="workFlowTaskDto.Name" Required="true" RequiredError="El nombre de tarea es requerido!"
+                                          Validation="@(new LengthAttribute(3, 100){ErrorMessage="El nombre de tarea debe contener entre [3,100] caracteres!"})" />
+
+                            <MudTextField T="string" Label="Descripción" @bind-Value="workFlowTaskDto.Description" AutoGrow="true" Required="true" RequiredError="La descripción de la tarea es requerida!" />
+
+                            <MudField Label="Prioridad*" Underline="false">
+                                <ChildContent>
+                                    <MudChipSet T="PriorityDto" @bind-SelectedValue="workFlowTaskDto.Priority" CheckMark SelectionMode="SelectionMode.ToggleSelection">
+                                        <MudChip Color="Color.Default" Value="@PriorityDto.BAJA">BAJA</MudChip>
+                                        <MudChip Color="Color.Warning" Value="@PriorityDto.MEDIA">MEDIA</MudChip>
+                                        <MudChip Color="Color.Error" Value="@PriorityDto.ALTA">ALTA</MudChip>
+                                    </MudChipSet>
+                                </ChildContent>
+                            </MudField>
+
+                            <MudSelect @bind-Value="workFlowTaskDto.WorkFlowId"
+                                       Label="Flujo de Trabajo" Required Placeholder="Seleccionar" Strict="true">
+                                @if(workFlows is not null)
+                                {
+                                    @foreach (var workFLow in workFlows)
+                                    {
+                                        <MudSelectItem Value="@workFLow.Id">@workFLow.Name</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+
+                            <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudTooltip Text="Validar Datos De Campos">
+                                        <MudIconButton Icon="@Icons.Material.Rounded.CheckCircle" Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(()=>form.Validate())" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Limpiar Campos y Validación">
+                                        <MudIconButton Icon="@Icons.Material.Rounded.ClearAll" Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false" OnClick="@(()=>form.ResetAsync())" Class="mx-2" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Limpiar Validación">
+                                        <MudIconButton Icon="@Icons.Material.Rounded.Clear" Variant="Variant.Filled" DropShadow="false" OnClick="@(()=>form.ResetValidation())" />
+                                    </MudTooltip>
+                                </MudStack>
+                                <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudTooltip Text="Ir a Tareas">
+                                        <MudButton Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Cancel" OnClick="CancelDialog">Cancelar</MudButton>
+                                    </MudTooltip>
+                                    <MudTooltip Text="Guardar Tarea">
+                                        <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(!success)" StartIcon="@Icons.Material.Rounded.Save" OnClick="async()=> await SaveAsync()">@saveButtonText</MudButton>
+                                    </MudTooltip>
+                                </MudStack>
+                            </MudStack>
+                        </MudForm>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public WorkFlowTaskDto workFlowTaskDto { get; set; } = new();
+
+    [Parameter]
+    public int ProjectId { get; set; }
+
+    bool success;
+    MudForm form;
+
+    private string saveButtonText { get; set; } = "Guardar";
+
+    private IEnumerable<WorkFlowDto> workFlows { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadAllDataAsync();
+    }
+
+    private async Task LoadAllDataAsync()
+    {
+        if (!workFlowTaskDto.Id.Equals(0))
+        {
+            workFlowTaskDto = await LoadWorkFlowTaskToUpdate(workFlowTaskDto.Id);
+            this.StateHasChanged();
+        }
+        await LoadWorkFlowsByProjectAsync(ProjectId);
+        await Task.CompletedTask;
+    }
+
+    private void CancelDialog()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void CloseAfterSave()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    #region crud
+    private async Task LoadWorkFlowsByProjectAsync(int projectId)
+    {
+        var response = await _workFlowService.GetAllByProjectAsync(projectId);
+        if (response.IsSuccess)
+        {
+            workFlows = response.Data ?? [];
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[MOSTRAR FLUJOS DE TRABAJOS]", response.Message, response.Errors);
+        }
+        await Task.CompletedTask;
+    }
+    private async Task SaveAsync()
+    {
+        saveButtonText = "Guardando...";
+        //obligar la validacion de todos los campos
+        await form.Validate();
+
+        //si todos los campos estan validados
+        if (form.IsValid)
+        {
+            if (!workFlowTaskDto.Id.Equals(0))
+            {
+                await UpdateAsync();
+            }
+            else
+            {
+                await InsertAsync();
+            }
+        }
+        await Task.CompletedTask;
+    }
+    private async Task InsertAsync()
+    {
+        var response = await _workFlowTaskService.InsertAsync(workFlowTaskDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            CloseAfterSave();
+        }
+        else
+        {
+            saveButtonText = "Guardar";
+            await _customDialogService.ShowErrorDialogAsync("[CREAR TAREA]", response.Message, response.Errors);
+        }
+    }
+    private async Task UpdateAsync()
+    {
+        var response = await _workFlowTaskService.UpdateAsync(workFlowTaskDto.Id, workFlowTaskDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            CloseAfterSave();
+        }
+        else
+        {
+            saveButtonText = "Guardar";
+            await _customDialogService.ShowErrorDialogAsync("[ACTUALIZAR TAREA]", response.Message, response.Errors);
+        }
+    }
+    private async Task<WorkFlowTaskDto> LoadWorkFlowTaskToUpdate(int workFlowTaskId)
+    {
+        var response = await _workFlowTaskService.GetAsync(workFlowTaskId);
+        if (response.IsSuccess)
+        {
+            return response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ENCONTRAR TAREA]", response.Message, response.Errors);
+        }
+        return new WorkFlowTaskDto();
+    }
+    #endregion
+}

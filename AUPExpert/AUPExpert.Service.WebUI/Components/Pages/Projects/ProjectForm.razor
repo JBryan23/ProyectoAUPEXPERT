@@ -1,0 +1,193 @@
+﻿@page "/Projects/projectform/{ProjectId}"
+
+@using System.ComponentModel.DataAnnotations
+@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Services.Projects
+
+@inject ProjectService _projectService
+
+<PageTitle>Formulario de Proyecto</PageTitle>
+<MudStack Class="pa-6" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height:100%;">
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudPaper Class="pa-4" Elevation="3">
+                <MudForm Model="projectDto" @ref="form" @bind-IsValid="@success" Spacing="6">
+                    <MudText Typo="Typo.h6" Align="Align.Center">Proyecto</MudText>
+
+                    <MudTextField T="string" Label="Nombre" @bind-Value="projectDto.Name" Required="true" RequiredError="El nombre de proyecto es requerido!"
+                        Validation="@(new LengthAttribute(3, 100){ErrorMessage="El nombre del proyecto debe contener entre [3,100] caracteres!"})"/>
+
+                    <MudTextField T="string" Label="Descripción" @bind-Value="projectDto.Description" AutoGrow="true" Required="true" RequiredError="La descripción del proyecto es requerida!" />
+
+                    @if(projectDto.State.Equals(ProjectStateDto.PENDIENTE))
+                    {
+                        <MudDateRangePicker Label="Duración de Proyecto" @bind-DateRange="@dateRange" DateFormat="dd/MM/yyyy" TransformOrigin="Origin.CenterLeft"
+                                        Required="true" RequiredError="El intervalo de tiempo del proyecto es requerida!" />
+                    }
+                    <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                            <MudTooltip Text="Validar Datos De Campos">
+                                <MudIconButton Icon="@Icons.Material.Rounded.CheckCircle" Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(()=>form.Validate())" />
+                            </MudTooltip>
+                            <MudTooltip Text="Limpiar Campos y Validación">
+                                <MudIconButton Icon="@Icons.Material.Rounded.ClearAll" Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false" OnClick="@(()=>form.ResetAsync())" Class="mx-2" />
+                            </MudTooltip>
+                            <MudTooltip Text="Limpiar Validación">
+                                <MudIconButton Icon="@Icons.Material.Rounded.Clear" Variant="Variant.Filled" DropShadow="false" OnClick="@(()=>form.ResetValidation())" />
+                            </MudTooltip>
+                        </MudStack>
+                        <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                            <MudTooltip Text="Ir a Projectos">
+                                <MudButton Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Cancel" OnClick="GoToProjects">Cancelar</MudButton>
+                            </MudTooltip>
+                            <MudTooltip Text="Guardar Flujo de Trabajo">
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(!success)" StartIcon="@Icons.Material.Rounded.Save" OnClick="async()=> await SaveAsync()">@saveButtonText</MudButton>
+                            </MudTooltip>
+                        </MudStack>
+                    </MudStack>
+                </MudForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+@code {
+    bool success;
+    MudForm form;
+
+    private string saveButtonText { get; set; } = "Guardar";
+
+    private ProjectDto projectDto { get; set; } = new();
+    private DateRange dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(1).Date);
+
+    [Parameter]
+    public string ProjectId { get; set; }
+
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadNavegationRoutes();
+        projectDto.StartDate = (DateTime)dateRange.Start!;
+        projectDto.EndDate = (DateTime)dateRange.End!;
+        if(!ProjectId.Equals("0"))
+        {
+            projectDto = await LoadProjectToUpdate(ProjectId);
+        }
+        await base.OnInitializedAsync();
+    }
+
+    #region navegacion
+    private void LoadNavegationRoutes()
+    {
+        if (!Routes.Exists(x => x.Href!.Equals($"/Projects/projectform/{ProjectId}")))
+        {
+            if (!ProjectId.Equals("0"))
+            {
+                Routes.Add(new BreadcrumbItem(
+                    text: "Proyecto", href: $"/Projects/projectform/{ProjectId}", icon: Icons.Material.Rounded.Edit
+                ));
+            }
+            else
+            {
+                Routes.Add(new BreadcrumbItem(
+                    text: "Proyecto", href: $"/Projects/projectform/{ProjectId}", icon: Icons.Material.Rounded.Add
+                ));
+            }
+        }
+        else
+        {
+            var route = Routes.Find(x => x.Href!.Equals($"/Projects/projectform/{ProjectId}"));
+            if (route is not null)
+            {
+                var routeIndex = Routes.IndexOf(route);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex) - 1);
+            }
+        }
+    }
+    #endregion
+    private void BackToHome()
+    {
+        if(ProjectId is not null)
+        {
+            _navigationManager.NavigateTo("/Projects/projects", false, false);
+            return;
+        }
+        _navigationManager.NavigateTo("/", false, false);
+    }
+
+    #region crud
+    private async Task SaveAsync()
+    {
+        saveButtonText = "Guardando...";
+        //obligar la validacion de todos los campos
+        await form.Validate();
+
+        //si todos los campos estan validados
+        if (form.IsValid)
+        {
+            projectDto.StartDate = (DateTime)dateRange.Start!;
+            projectDto.EndDate = (DateTime)dateRange.End!;
+            if (!ProjectId.Equals("0"))
+            {
+                await UpdateAsync();
+            }
+            else
+            {
+                await InsertAsync();
+            }
+        }
+        await Task.CompletedTask;
+    }
+    private async Task InsertAsync()
+    {
+        var response = await _projectService.InsertAsync(projectDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            _navigationManager.NavigateTo("/Projects/projects", true, false);
+        }
+        else
+        {
+            saveButtonText = "Guardar";
+            await _customDialogService.ShowErrorDialogAsync("[CREAR PROYECTO]", response.Message, response.Errors);
+        }
+    }
+    private async Task UpdateAsync()
+    {
+        var response = await _projectService.UpdateAsync(int.Parse(ProjectId), projectDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            _navigationManager.NavigateTo("/Projects/projects", true, false);
+        }
+        else
+        {
+            saveButtonText = "Guardar";
+            await _customDialogService.ShowErrorDialogAsync("[ACTUALIZAR PROYECTO]", response.Message, response.Errors);
+        }
+    }
+    private async Task<ProjectDto> LoadProjectToUpdate(string projectId)
+    {
+        var response = await _projectService.GetAsync(int.Parse(projectId));
+        if (response.IsSuccess)
+        {
+            return response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ENCONTRAR PROYECTO]", response.Message, response.Errors);
+        }
+        return new ProjectDto();
+    }
+    #endregion
+
+    #region rutas
+    private void GoToProjects()
+    {
+        _navigationManager.NavigateTo("/Projects/projects", false, false);
+    }
+    #endregion
+}

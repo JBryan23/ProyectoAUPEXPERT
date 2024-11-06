@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Proyecto</title>
+    <link rel="stylesheet" href="proyecto-nuevo.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Crear nuevo proyecto</h1>
+        <form action="#" method="post">
+            <label for="nombreProyecto">Nombre del Proyecto:</label>
+            <input type="text" id="nombreProyecto" name="nombreProyecto" required>
+
+            <label for="descripcionProyecto">Descripción del Proyecto:</label>
+            <textarea id="descripcionProyecto" name="descripcionProyecto" rows="4" required></textarea>
+
+            <label for="fechaInicio">Fecha de Inicio:</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" required>
+
+            <label for="fechaFin">Fecha de Finalización:</label>
+            <input type="date" id="fechaFin" name="fechaFin" required>
+
+            <nav>
+                <button class="save-button">Guardar</button>
+            </nav>
+            
+        </form>
+    </div>
+</body>
+</html>

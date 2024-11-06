@@ -1,0 +1,160 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #6B73FF, #000DFF);
+    animation: gradient-animation 5s infinite alternate;
+}
+
+@keyframes gradient-animation {
+    0% {
+        background: linear-gradient(135deg, #6B73FF, #000DFF);
+    }
+    100% {
+        background: linear-gradient(135deg, #8E2DE2, #4A00E0);
+    }
+}
+
+.form-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    width: 700px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+input[type="text"],
+textarea {
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    border-color: #6B73FF;
+    box-shadow: 0 0 8px rgba(107, 115, 255, 0.3);
+    outline: none;
+}
+
+button {
+    background-color: #6B73FF;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #000DFF;
+}
+
+/* Estilos para la tabla */
+table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+td {
+    background-color: white;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.edit-btn, .delete-btn {
+    background-color: #6B73FF;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-btn:hover {
+    background-color: #4A90E2;
+}
+
+.delete-btn:hover {
+    background-color: #FF4C4C;
+}
+
+/* Estilos responsivos */
+@media (max-width: 600px) {
+    .form-container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+}

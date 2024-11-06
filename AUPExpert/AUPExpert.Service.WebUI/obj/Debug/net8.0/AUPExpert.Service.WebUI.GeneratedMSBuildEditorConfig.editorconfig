@@ -1,0 +1,98 @@
+is_global = true
+build_property.MudDebugAnalyzer = 
+build_property.MudAllowedAttributePattern = 
+build_property.MudIllegalParameters = 
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = AUPExpert.Service.WebUI
+build_property.RootNamespace = AUPExpert.Service.WebUI
+build_property.ProjectDir = C:\Universidad UNAB\Ciclo 06\Sistemas Expertos\AUP\AUPExpert\AUPExpert\AUPExpert.Service.WebUI\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Universidad UNAB\Ciclo 06\Sistemas Expertos\AUP\AUPExpert\AUPExpert\AUPExpert.Service.WebUI
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/App.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Layout/ErrorDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcRXJyb3JEaWFsb2cucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Layout/SimpleGenericDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcU2ltcGxlR2VuZXJpY0RpYWxvZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/aupexpert-assistant/Assistant.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xhdXBleHBlcnQtYXNzaXN0YW50XEFzc2lzdGFudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Iterations/IterationForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xJdGVyYXRpb25zXEl0ZXJhdGlvbkZvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Iterations/Iterations.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xJdGVyYXRpb25zXEl0ZXJhdGlvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Phases/Phases.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQaGFzZXNcUGhhc2VzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Projects/ProjectForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcm9qZWN0c1xQcm9qZWN0Rm9ybS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Projects/Projects.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcm9qZWN0c1xQcm9qZWN0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/WorkFLows/WorkFlows.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXb3JrRkxvd3NcV29ya0Zsb3dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/WorkFlowTasks/WorkFlowTaskForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXb3JrRmxvd1Rhc2tzXFdvcmtGbG93VGFza0Zvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Pages/WorkFlowTasks/WorkFlowTasks.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXb3JrRmxvd1Rhc2tzXFdvcmtGbG93VGFza3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Routes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-ah9mkc5xig
+
+[C:/Universidad UNAB/Ciclo 06/Sistemas Expertos/AUP/AUPExpert/AUPExpert/AUPExpert.Service.WebUI/Components/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-s4uio9g536

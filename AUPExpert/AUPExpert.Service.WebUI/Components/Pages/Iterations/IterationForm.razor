@@ -1,0 +1,231 @@
+﻿@page "/Iterations/iterationform"
+@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Services.Iterations
+
+@inject IterationService _iterationService
+
+<PageTitle>Formulario de Iteración</PageTitle>
+
+<MudStack Class="pa-6" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height:100%;">
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudPaper Class="pa-4" Elevation="3">
+                <MudForm Model="iterationDto" @ref="form" @bind-IsValid="@success" Spacing="6">
+                    <MudText Typo="Typo.h6" Align="Align.Center">Iteración</MudText>
+
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" >
+                        <MudText Typo="Typo.subtitle1">Código: @iterationDto.Code</MudText>
+                        <MudText Typo="Typo.subtitle1" Color="Color.Info">Fase: @iterationDto.Phase</MudText>
+                    </MudStack>
+
+                    <MudTextField T="string" Label="Objetivo" @bind-Value="iterationDto.Objective" Lines="5" Required="true" RequiredError="El objetivo de la iteracion es requerido!" />
+                    
+                    <MudDateRangePicker Label="Duración de Iteración" @bind-DateRange="@dateRange" DateFormat="dd/MM/yyyy" TransformOrigin="Origin.CenterLeft"
+                                        Required="true" RequiredError="El intervalo de tiempo de la iteracion es requerida!" />
+
+                    <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                            <MudTooltip Text="Validar Datos De Campos">
+                                <MudIconButton Icon="@Icons.Material.Rounded.CheckCircle" Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(()=>form.Validate())" />
+                            </MudTooltip>
+                            <MudTooltip Text="Limpiar Campos y Validación">
+                                <MudIconButton Icon="@Icons.Material.Rounded.ClearAll" Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false" OnClick="@(()=>form.ResetAsync())" Class="mx-2" />
+                            </MudTooltip>
+                            <MudTooltip Text="Limpiar Validación">
+                                <MudIconButton Icon="@Icons.Material.Rounded.Clear" Variant="Variant.Filled" DropShadow="false" OnClick="@(()=>form.ResetValidation())" />
+                            </MudTooltip>
+                        </MudStack>
+                        <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                            <MudTooltip Text="Ir a Iteraciones">
+                                <MudButton Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Rounded.Cancel" OnClick="GoToIterations">Cancelar</MudButton>
+                            </MudTooltip>
+                            <MudTooltip Text="Guardar Flujo de Trabajo">
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(!success)" StartIcon="@Icons.Material.Rounded.Save" OnClick="async()=> await SaveAsync()">@saveButtonText</MudButton>
+                            </MudTooltip>
+                        </MudStack>
+                    </MudStack>
+                </MudForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+@code{
+    bool success;
+    MudForm form;
+
+    private string saveButtonText { get; set; } = "Guardar";
+
+    private IterationDto iterationDto { get; set; } = new();
+    private DateRange dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(1).Date);
+
+
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        iterationDto.StartDate = (DateTime)dateRange.Start!;
+        iterationDto.EndDate = (DateTime)dateRange.End!;
+
+        //valores desde el query string
+        GetValuesFromQueryString();
+        LoadNavegationRoutes();
+        //buscar la iteracion y cargar si id > 0
+        if (iterationDto.Id > 0)
+        {
+            iterationDto = await LoadIterationToUpdate(iterationDto.Id);
+        }
+        else
+        {
+            iterationDto.Code += (await GetIterationNumberAsync()) + 1;
+        }
+    }
+
+    private void GetValuesFromQueryString()
+    {
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("ProjectId", out var projectId))
+        {
+            iterationDto.ProjectId = int.Parse(projectId);
+        }
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("PhaseId", out var phaseId))
+        {
+            iterationDto.Phase = (PhaseDto)int.Parse(phaseId);
+        }
+        //opcional
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("Id", out var id))
+        {
+            iterationDto.Id = int.Parse(id);
+        }
+        else
+        {
+            iterationDto.Id = 0;
+        }
+    }
+
+    private async Task<int> GetIterationNumberAsync()
+    {
+        var response = await _iterationService.CountAllAsync(iterationDto.ProjectId);
+        if (response.IsSuccess)
+        {
+            return response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[CONTAR ITERACIONES]", response.Message, response.Errors);
+            return 0;
+        }
+    }
+
+    #region navegacion
+    private void LoadNavegationRoutes()
+    {
+        string route = $"/Iterations/iterationform?PhaseId={(int)iterationDto.Phase}&Id={iterationDto.Id}&ProjectId={iterationDto.ProjectId}";
+        if (!Routes.Exists(x => x.Href!.Equals(route)))
+        {
+            if (iterationDto.Id > 0)
+            {
+                Routes.Add(new BreadcrumbItem(
+                    text: "Iteración", href: route, icon: Icons.Material.Rounded.Edit
+                ));
+            }
+            else
+            {
+                Routes.Add(new BreadcrumbItem(
+                    text: "Iteración", href: route, icon: Icons.Material.Rounded.Add
+                ));
+            }
+        }
+        else
+        {
+            var routeExits = Routes.Find(x => x.Href!.Equals(route));
+            if (routeExits is not null)
+            {
+                var routeIndex = Routes.IndexOf(routeExits);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex) - 1);
+            }
+        }
+    }
+    #endregion
+    private void BackToHome()
+    {
+        _navigationManager.NavigateTo($"/Iterations/iterations?PhaseId={(int)iterationDto.Phase}&ProjectId={iterationDto.ProjectId}", true, false);
+    }
+
+    #region crud
+    private async Task SaveAsync()
+    {
+        saveButtonText = "Guardando...";
+        //obligar la validacion de todos los campos
+        await form.Validate();
+
+        //si todos los campos estan validados
+        if (form.IsValid)
+        {
+            iterationDto.StartDate = (DateTime)dateRange.Start!;
+            iterationDto.EndDate = (DateTime)dateRange.End!;
+            if (iterationDto.Id > 0)
+            {
+                await UpdateAsync();
+            }
+            else
+            {
+                await InsertAsync();
+            }
+        }
+        await Task.CompletedTask;
+    }
+    private async Task InsertAsync()
+    {
+        var response = await _iterationService.InsertAsync(iterationDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            _navigationManager.NavigateTo($"/Iterations/iterations?PhaseId={(int)iterationDto.Phase}&ProjectId={iterationDto.ProjectId}", true, false);
+        }
+        else
+        {
+            saveButtonText = "Guardar";
+            await _customDialogService.ShowErrorDialogAsync("[CREAR ITERACIÓN]", response.Message, response.Errors);
+        }
+    }
+    private async Task UpdateAsync()
+    {
+        var response = await _iterationService.UpdateAsync(iterationDto.Id, iterationDto);
+        if (response.IsSuccess)
+        {
+            _snackbar.Add(response.Message, Severity.Success);
+            _navigationManager.NavigateTo($"/Iterations/iterations?PhaseId={(int)iterationDto.Phase}&ProjectId={iterationDto.ProjectId}", true, false);
+        }
+        else
+        {
+            saveButtonText = "Guardar";
+            await _customDialogService.ShowErrorDialogAsync("[ACTUALIZAR ITERACIÓN]", response.Message, response.Errors);
+        }
+    }
+    private async Task<IterationDto> LoadIterationToUpdate(int iterationId)
+    {
+        //el string debe ser un hash
+        var response = await _iterationService.GetAsync(iterationId);
+        if (response.IsSuccess)
+        {
+            return response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ENCONTRAR ITERACIÓN]", response.Message, response.Errors);
+        }
+        return new IterationDto();
+    }
+    #endregion
+
+    #region rutas
+    private void GoToIterations()
+    {
+        _navigationManager.NavigateTo($"/Iterations/iterations?PhaseId={(int)iterationDto.Phase}&ProjectId={iterationDto.ProjectId}", false, false);
+    }
+    #endregion
+}

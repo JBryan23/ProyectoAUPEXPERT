@@ -1,0 +1,379 @@
+﻿@page "/Iterations/iterations"
+@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Services.Iterations
+@using AUPExpert.Service.WebUI.Services.Projects
+
+@inject IterationService _iterationService
+@inject ProjectService _projectService
+
+<PageTitle>Iteraciones</PageTitle>
+<MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height:100%; width: 100%;">
+<MudTable T="IterationDto" Items="@items" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+FixedHeader="true" HorizontalScrollbar="true" Virtualize="true"
+          Loading="@isLoading" RowClass="cursor-pointer" LoadingProgressColor="Color.Info" 
+          RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent"
+          Filter="new Func<IterationDto,bool>(FilterFunc1)"
+              id="table" Style="height:100%; width: 100%;" Height="70%">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Iteraciones</MudText>
+        <MudSpacer />
+            <MudTooltip Text="Buscar por Código ó Inicio ó Finalización">
+            <MudTextField @bind-Value="searchString1" Placeholder="Buscar ..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" ></MudTextField>
+        </MudTooltip>
+    </ToolBarContent>
+    <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<IterationDto, object>(x => x.Code)">No.</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<IterationDto, object>(x => x.Objective)">Objetivo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<IterationDto, object>(x => x.StartDate!)">Inicio</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<IterationDto, object>(x => x.EndDate!)">Finalización</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:center">Fase</MudTh>
+            <MudTh Style="text-align:center">Estado</MudTh>
+        <MudTh Style="text-align:center">Acciones</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="No.">@context.Code</MudTd>
+        <MudTd DataLabel="Objetivo">@context.Objective</MudTd>
+        <MudTd DataLabel="Inicio">@(new DateConverter("dd/MM/yyyy").Set(context.StartDate))</MudTd>
+        <MudTd DataLabel="Finalización">@(new DateConverter("dd/MM/yyyy").Set(context.EndDate))</MudTd>
+        <MudTd DataLabel="Fase">
+            <MudText Color="Color.Default" Class="mud-theme-tertiary rounded pa-1" Align="Align.Center">@context.Phase</MudText>
+        </MudTd>
+        <MudTd DataLabel="Estado">
+                @if (context.State.Equals(IterationStateDto.PENDIENTE))
+                {
+                    <MudText Color="Color.Default" Class="mud-theme-info rounded pa-1" Align="Align.Center">
+                        @context.State
+                    </MudText>
+                }
+                else
+                {
+                    <MudText Color="Color.Default" Class="mud-theme-success rounded pa-1" Align="Align.Center">
+                        @context.State
+                    </MudText>
+                }
+        </MudTd>
+        <MudTd DataLabel="Acciones">
+            <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+                @if (context.State.Equals(IterationStateDto.PENDIENTE))
+                {
+                    <MudTooltip Text="Marcar como FINALIZADA la Iteración (Obligatorio para agregar una nueva)">
+                        <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.TaskAlt"
+                                       Color="@Color.Primary" OnClick="async()=> await CompleteIterationAsync(context)" />
+                    </MudTooltip>
+                }
+                <MudTooltip Text="Gestionar Actividades">
+                    <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Task"
+                                   Color="@Color.Info" OnClick="()=>GoToActivities(context.Id)" />
+                </MudTooltip>
+                @if (items.Count() > 0 && items.Last().Equals(context))
+                {
+                     @if (ProjectDto is not null && ProjectDto.State.Equals(ProjectStateDto.PENDIENTE))
+                     {
+                            @if (ProjectDto is not null && !IsThisPhaseComplete(int.Parse(PhaseId), ProjectDto))
+                            {
+                                <MudTooltip Text="Editar Iteración">
+                                    <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Edit"
+                                                   Color="@Color.Warning" OnClick="()=>GoToIterationForm(context.Id)" />
+                                </MudTooltip>
+                            }
+                     }
+                }
+                @if (ProjectDto is not null && ProjectDto.State.Equals(ProjectStateDto.PENDIENTE))
+                {
+                    @if (ProjectDto is not null && !IsThisPhaseComplete(int.Parse(PhaseId), ProjectDto))
+                    {
+                            <MudTooltip Text="Eliminar Iteración" Placement="Placement.Left">
+                                <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Delete"
+                                               Color="@Color.Error" OnClick="async()=> await DeleteIteracionAsync(context.Id, context.Code)" />
+                            </MudTooltip>
+                    }
+
+                }
+            </MudStack>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100, int.MaxValue }"
+                       RowsPerPageString="@rowsPerPageString"
+                       InfoFormat="@infoFormat"
+                       AllItemsText="@allItemsText"
+                       HorizontalAlignment="@horizontalAlignment"/>
+            <MudScrollToTop TopOffset="0"
+                            Selector="#table"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="invisible"
+                            Visible="CanAddNewIterationAsync()" OnClick="() => GoToIterationForm(0)">
+                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" />
+            </MudScrollToTop>
+    </PagerContent>
+</MudTable>
+</MudStack>
+@code {
+    private bool isLoading;
+
+    //seleccionar una fila
+    private int selectedRowNumber = -1;
+    private MudTable<IterationDto> mudTable;
+    private List<string> clickedEvents = new();
+
+    //buscador
+    private string searchString1 = "";
+
+    //configuracion de paginado
+    private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
+    private string rowsPerPageString = "Filas Por Página:";
+    private string infoFormat = "{first_item}-{last_item} de {all_items}";
+    private string allItemsText = "Todos";
+
+    //listado de proyectos
+    private IEnumerable<IterationDto> items = [];
+
+    public string PhaseId { get; set; }
+    public int ProjectId { get; set; }
+    public ProjectDto ProjectDto { get; set; }
+
+
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetValuesFromQueryString();
+        LoadNavegationRoutes();
+        await LoadProyectDataAsync();
+        await base.OnInitializedAsync();
+
+        await GetIterationByProjectAndPhaseAsync();
+    }
+
+    private void GetValuesFromQueryString()
+    {
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("ProjectId", out var projectId))
+        {
+            ProjectId = int.Parse(projectId);
+        }
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("PhaseId", out var phaseId))
+        {
+            PhaseId = phaseId;
+        }
+
+    }
+    private async Task LoadProyectDataAsync()
+    {
+        var response = await _projectService.GetAsync(ProjectId);
+        if (response.IsSuccess)
+        {
+            ProjectDto = response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ENCONTRAR PROYECTO]", response.Message, response.Errors);
+        }
+    }
+    #region navegacion
+    private void LoadNavegationRoutes()
+    {
+        if (!Routes.Exists(x => x.Href!.Equals($"/Iterations/iterations?PhaseId={PhaseId}&ProjectId={ProjectId}")))
+        {
+            Routes.Add(new BreadcrumbItem(
+                text: "Iteraciones", href: $"/Iterations/iterations?PhaseId={PhaseId}&ProjectId={ProjectId}", icon: GetCorrectIcon(PhaseId)
+            ));
+        }
+        else
+        {
+            var route = Routes.Find(x => x.Href!.Equals($"/Iterations/iterations?PhaseId={PhaseId}&ProjectId={ProjectId}"));
+            if (route is not null)
+            {
+                var routeIndex = Routes.IndexOf(route);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex) - 1);
+            }
+        }
+    }
+    private string? GetCorrectIcon(string phaseId)
+    {
+        switch (phaseId)
+        {
+            case "2":
+                return Icons.Material.Rounded.Schema;
+            case "3":
+                return Icons.Material.Rounded.Engineering;
+            case "4":
+                return Icons.Material.Rounded.WorkHistory;
+            default:
+                return Icons.Material.Rounded.Start;
+        }
+    }
+    #endregion
+    #region crud
+
+    private async Task GetIterationByProjectAndPhaseAsync()
+    {
+        isLoading = true;
+
+        var response = await _iterationService.GetIterationByProjectAndPhaseAsync(ProjectId, (PhaseDto)int.Parse(PhaseId));
+        if (response.IsSuccess)
+        {
+            items = response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[MOSTRAR ITERACIONES]", response.Message, response.Errors);
+        }
+        isLoading = false;
+    }
+    private async Task DeleteIteracionAsync(int iterationId, string name)
+    {
+        var validateIsLast = await _iterationService.IsThisLastIterationPerProjectAndPhaseAsync(iterationId, ProjectId, (PhaseDto)int.Parse(PhaseId));
+        if (validateIsLast.Data)
+        {
+            var result = await _customDialogService.ShowSimpleGenericDialogAsync("[ELIMINAR ITERACIÓN]",
+            $"¿Realmente desea eliminar esta iteración '{name}'? Este proceso no es reversible.", "Eliminar", Color.Error);
+            if (result)
+            {
+                var response = await _iterationService.DeleteAsync(iterationId);
+                if (response.IsSuccess)
+                {
+                    _snackbar.Add(response.Message, Severity.Success);
+                    var itemlist = items.ToList();
+                    itemlist.RemoveAll(x => x.Id == iterationId);
+                    items = itemlist.AsEnumerable();
+                }
+                else
+                {
+                    await _customDialogService.ShowErrorDialogAsync("[ELIMINAR ITERACIÓN]", response.Message, response.Errors);
+                }
+            }
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[ELIMINAR ITERACIÓN]", validateIsLast.Message, validateIsLast.Errors);
+        }
+        await Task.CompletedTask;
+    }
+    private async Task CompleteIterationAsync(IterationDto iterationDto)
+    {
+        var result = await _customDialogService.ShowSimpleGenericDialogAsync("[FINALIZAR ITERACIÓN]",
+        $"¿Realmente desea finalizar esta iteración '{iterationDto.Code}'? NO PODRÁ AGREGAR, ACTUALIZAR, ELIMINAR O CAMBIAR DE ESTADO LAS TAREAS, solo podrá ver y filtrar."+
+        "Solo las tareas FINALIZADAS se toman en cuenta en los análisis de datos. Este proceso no es reversible.", 
+        "Finalizar", Color.Success);
+        if (result)
+        {
+            iterationDto.State = IterationStateDto.FINALIZADO;
+            var response = await _iterationService.CompleteIterationAsync(iterationDto.Id, iterationDto);
+            if (response.IsSuccess)
+            {
+                _snackbar.Add(response.Message, Severity.Success);
+                await GetIterationByProjectAndPhaseAsync();
+            }
+            else
+            {
+                await _customDialogService.ShowErrorDialogAsync("[FINALIZAR ITERACIÓN]", response.Message, response.Errors);
+            }
+        }
+    }
+
+    private bool CanAddNewIterationAsync()
+    {
+        //validar estado de proyecto
+        if (ProjectDto is not null && ProjectDto.State.Equals(ProjectStateDto.FINALIZADO)) return false;
+
+        //validar si la fase se ha marcado como finalizada
+        if (ProjectDto is not null && IsThisPhaseComplete(int.Parse(PhaseId), ProjectDto)) return false;
+
+        //validar estado de la ultima iteracion
+        if(items.Count() > 0)
+        {
+            var lastIteration = items.Last();
+            if (lastIteration.State.Equals(IterationStateDto.FINALIZADO))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private bool IsThisPhaseComplete(int phaseId, ProjectDto projectDto)
+    {
+        var completed = false;
+        switch ((PhaseDto)phaseId)
+        {
+            case PhaseDto.INICIO:
+                if (projectDto.InitialPhaseCompleted) completed = true;
+                break;
+            case PhaseDto.ELABORACION:
+                if (projectDto.ElaborationPhaseCompleted) completed = true;
+                break;
+            case PhaseDto.CONSTRUCCION:
+                if (projectDto.ConstructionPhaseCompleted) completed = true;
+                break;
+            default:
+                if (projectDto.TransitionPhaseCompleted) completed = true;
+                break;
+        }
+        return completed;
+    }
+    #endregion
+
+    #region seleccionar fila
+    private void RowClickEvent(TableRowClickEventArgs<IterationDto> tableRowClickEventArgs)
+    {
+        clickedEvents.Add("Row has been clicked");
+    }
+    private string SelectedRowClassFunc(IterationDto iterationDto, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            clickedEvents.Add("Selected Row: None");
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(iterationDto))
+        {
+            selectedRowNumber = rowNumber;
+            clickedEvents.Add($"Selected Row: {rowNumber}");
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    #endregion
+
+    #region buscador
+    private bool FilterFunc1(IterationDto iterationDto) => FilterFunc(iterationDto, searchString1);
+
+    private bool FilterFunc(IterationDto iterarionDto, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (iterarionDto.Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (iterarionDto.StartDate.ToString()!.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (iterarionDto.EndDate.ToString()!.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    #endregion
+
+    #region rutas
+    private void GoToActivities(int iterationId)
+    {
+        _navigationManager.NavigateTo($"/tasks?IterationId={iterationId}&ProjectId={ProjectId}", false, false);
+    }
+    private void GoToIterationForm(int iterationId)
+    {
+        _navigationManager.NavigateTo($"/Iterations/iterationform?PhaseId={PhaseId}&Id={iterationId}&ProjectId={ProjectId}", false, false);
+    }
+    #endregion
+
+}

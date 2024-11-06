@@ -1,0 +1,283 @@
+﻿@page "/Projects/projects"
+@using AUPExpert.Application.DTO
+@using AUPExpert.Application.DTO.Enums
+@using AUPExpert.Service.WebUI.Services.Projects
+
+@inject ProjectService _projectService
+
+<PageTitle>Tus Proyectos</PageTitle>
+<MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height:100%; width: 100%;">
+<MudTable T="ProjectDto" Items="@items" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+FixedHeader="true" HorizontalScrollbar="true" Virtualize="true"
+          Loading="@isLoading" RowClass="cursor-pointer" LoadingProgressColor="Color.Info" 
+          RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent"
+          Filter="new Func<ProjectDto,bool>(FilterFunc1)"
+              id="table" Style="height:100%; width: 100%;" Height="70%">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Proyectos</MudText>
+        <MudSpacer />
+            <MudTooltip Text="Buscar por Nombre ó Inicio ó Finalización">
+            <MudTextField @bind-Value="searchString1" Placeholder="Buscar ..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" ></MudTextField>
+        </MudTooltip>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<ProjectDto, object>(x => x.Name)">Nombre</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<ProjectDto, object>(x => x.StartDate!)">Inicio</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<ProjectDto, object>(x => x.EndDate!)">Finalización</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center">Fases</MudTh>
+        <MudTh>Flujos</MudTh>
+        <MudTh Style="text-align:center"><MudTableSortLabel SortBy="new Func<ProjectDto, object>(x => x.State)">Estado</MudTableSortLabel></MudTh>
+        <MudTh Style="text-align:center">Acciones</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nombre">@context.Name</MudTd>
+        <MudTd DataLabel="Inicio">@(new DateConverter("dd/MM/yyyy").Set(context.StartDate))</MudTd>
+        <MudTd DataLabel="Finalización">@(new DateConverter("dd/MM/yyyy").Set(context.EndDate))</MudTd>
+            <MudTd DataLabel="Fases">
+                <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+                    <MudTooltip Text="Fase de Inicio">
+                        <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Start"
+                                       Color="@Color.Success" Disabled="!context.InitialPhaseCompleted" />
+                    </MudTooltip>
+                    <MudTooltip Text="Fase de Elaboración">
+                        <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Analytics"
+                                       Color="@Color.Success" Disabled="!context.ElaborationPhaseCompleted" />
+                    </MudTooltip>
+                    <MudTooltip Text="Fase de Construcción">
+                        <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Engineering"
+                                       Color="@Color.Success" Disabled="!context.ConstructionPhaseCompleted" />
+                    </MudTooltip>
+                    <MudTooltip Text="Fase de Transición">
+                        <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.WorkHistory"
+                                       Color="@Color.Success" Disabled="!context.TransitionPhaseCompleted" />
+                    </MudTooltip>
+                </MudStack>
+            </MudTd>
+            <MudTd DataLabel="Flujos">
+                <MudTooltip Text="Gestionar Flujos de Trabajo">
+                    <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.AccountTree"
+                                   Color="@Color.Success" Disabled="context.State==ProjectStateDto.FINALIZADO" OnClick="()=>GoToWorkFlows(context.Id)" />
+                </MudTooltip>
+            </MudTd>
+        <MudTd DataLabel="Estado">
+                @if(context.State.Equals(ProjectStateDto.PENDIENTE)){
+                    <MudText Color="Color.Default" Class="mud-theme-info rounded pa-1" Align="Align.Center">
+                        @context.State
+                    </MudText>
+                }
+                else
+                {
+                    <MudText Color="Color.Default" Class="mud-theme-success rounded pa-1" Align="Align.Center">
+                        @context.State
+                    </MudText>
+                }
+            </MudTd>
+        <MudTd DataLabel="Acciones">
+            <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+                @if (context.State.Equals(ProjectStateDto.PENDIENTE))
+                {
+                    <MudTooltip Text="Marcar como FINALIZADO el proyecto">
+                        <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.TaskAlt"
+                                           Color="@Color.Primary" OnClick="async()=> await FinishProjectsAsync(context.Id, context.Name, context.State)" />
+                    </MudTooltip>
+                }
+                <MudTooltip Text="Ver Fases">
+                    <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.ViewCompactAlt"
+                                   Color="@Color.Info" OnClick="()=>GoToPhases(context.Id)" />
+                </MudTooltip>
+                <MudTooltip Text="Editar Proyecto">
+                    <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Edit"
+                                   Color="@Color.Warning" OnClick="()=>GoToProjectForm(context.Id)" />
+                </MudTooltip>
+                <MudTooltip Text="Eliminar Proyecto">
+                    <MudIconButton Variant="Variant.Text" Size="Size.Small" Icon="@Icons.Material.Rounded.Delete"
+                                   Color="@Color.Error" OnClick="async()=> await DeleteProjectsAsync(context.Id, context.Name)" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100, int.MaxValue }"
+                       RowsPerPageString="@rowsPerPageString"
+                       InfoFormat="@infoFormat"
+                       AllItemsText="@allItemsText"
+                       HorizontalAlignment="@horizontalAlignment" />
+            <MudScrollToTop TopOffset="0"
+                            Selector="#table"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="invisible"
+                        Visible="true" OnClick="() => GoToProjectForm(0)">
+                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" />
+            </MudScrollToTop>
+    </PagerContent>
+</MudTable>
+</MudStack>
+@code {
+
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    private bool isLoading;
+
+    //seleccionar una fila
+    private int selectedRowNumber = -1;
+    private MudTable<ProjectDto> mudTable;
+    private List<string> clickedEvents = new();
+
+    //buscador
+    private string searchString1 = "";
+
+    //configuracion de paginado
+    private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
+    private string rowsPerPageString = "Filas Por Página:";
+    private string infoFormat = "{first_item}-{last_item} de {all_items}";
+    private string allItemsText = "Todos";
+
+    //listado de proyectos
+    private IEnumerable<ProjectDto> items = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        LoadNavegationRoutes();
+        await LoadProjectsAsync();
+    }
+
+    #region navegacion
+    private void LoadNavegationRoutes()
+    {
+        if (!Routes.Exists(x => x.Href!.Equals("/Projects/projects")))
+        {
+            Routes.Add(new BreadcrumbItem(
+                text: "Proyectos", href: "/Projects/projects", icon: Icons.Material.Rounded.Workspaces
+            ));
+        }
+        else
+        {
+            var route = Routes.Find(x => x.Href!.Equals("/Projects/projects"));
+            if (route is not null)
+            {
+                var routeIndex = Routes.IndexOf(route);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex) - 1);
+            }
+        }
+    }
+    #endregion
+
+    #region crud
+    private async Task LoadProjectsAsync()
+    {
+        isLoading = true;
+
+        var response = await _projectService.GetAllAsync();
+        if (response.IsSuccess)
+        {
+            items = response.Data;
+        }
+        else
+        {
+            await _customDialogService.ShowErrorDialogAsync("[MOSTRAR PROYECTOS]", response.Message, response.Errors);
+        }
+        isLoading = false;
+    }
+    private async Task DeleteProjectsAsync(int projectId, string name)
+    {
+        var result = await _customDialogService.ShowSimpleGenericDialogAsync("[ELIMINAR PROYECTO]", 
+        $"¿Realmente desea eliminar el proyecto '{name}'? Este proceso no es reversible.", "Eliminar", Color.Error);
+        if (result)
+        {
+            var response = await _projectService.DeleteAsync(projectId);
+            if (response.IsSuccess)
+            {
+                _snackbar.Add(response.Message, Severity.Success);
+                var itemlist = items.ToList();
+                itemlist.RemoveAll(x => x.Id == projectId);
+                items = itemlist.AsEnumerable();
+            }
+            else
+            {
+                await _customDialogService.ShowErrorDialogAsync("[ELIMINAR PROYECTO]", response.Message, response.Errors);
+            }
+        }
+        await Task.CompletedTask;
+    }
+    private async Task FinishProjectsAsync(int projectId, string name, ProjectStateDto stateDto)
+    {
+        var result = await _customDialogService.ShowSimpleGenericDialogAsync("[FINALIZAR PROYECTO]",
+        $"¿Realmente desea finalizar el proyecto '{name}'? Previamente deben estar completadas las cuatro fases de la metodología.", "Finalizar", Color.Success);
+        if (result)
+        {
+            var response = await _projectService.FinishProjectAsync(projectId, stateDto);
+            if (response.IsSuccess)
+            {
+                _snackbar.Add(response.Message, Severity.Success);
+                await LoadProjectsAsync();
+            }
+            else
+            {
+                await _customDialogService.ShowErrorDialogAsync("[FINALIZAR PROYECTO]", response.Message, response.Errors);
+            }
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region seleccionar fila
+    private void RowClickEvent(TableRowClickEventArgs<ProjectDto> tableRowClickEventArgs)
+    {
+        clickedEvents.Add("Row has been clicked");
+    }
+    private string SelectedRowClassFunc(ProjectDto projectDto, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            clickedEvents.Add("Selected Row: None");
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(projectDto))
+        {
+            selectedRowNumber = rowNumber;
+            clickedEvents.Add($"Selected Row: {rowNumber}");
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    #endregion
+
+    #region buscador
+    private bool FilterFunc1(ProjectDto projectDto) => FilterFunc(projectDto, searchString1);
+
+    private bool FilterFunc(ProjectDto projectDto, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (projectDto.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (projectDto.StartDate.ToString()!.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (projectDto.EndDate.ToString()!.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    #endregion
+
+    #region rutas
+    private void GoToWorkFlows(int projectId)
+    {
+        _navigationManager.NavigateTo($"/WorkFlows/workflows?ProjectId={projectId}", false, false);
+    }
+    private void GoToPhases(int projectId)
+    {
+        _navigationManager.NavigateTo($"/Phases/phases?ProjectId={projectId}", false, false);
+    }
+    private void GoToProjectForm(int projectId)
+    {
+        _navigationManager.NavigateTo($"/Projects/projectform/{projectId}", false, false);
+    }
+    #endregion
+
+}

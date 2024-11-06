@@ -1,0 +1,58 @@
+﻿@page "/"
+
+<PageTitle>Proyectos - AUPExpert</PageTitle>
+
+<MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="10" Style="height:100%;">
+    <MudPaper Class="pa-3 rounded-xl" Style="@($"background:{Colors.DeepPurple.Lighten5};")" Width="300px" Height="300px">
+        <div class="d-flex justify-center">
+            <MudImage ObjectFit="ObjectFit.Contain" Height="200" Width="200" Src="img/home/tus-proyectos.svg" Alt="Proyectos" Elevation="0" Class="rounded-lg mt-3" />
+        </div>
+        <MudButton Class="mt-3 rounded-xl" Variant="Variant.Filled" StartIcon="@Icons.Material.Rounded.Workspaces" Color="Color.Primary" IconColor="Color.Inherit" Size="Size.Large" FullWidth="true" OnClick="GoToProjects">Tus Proyectos</MudButton>
+    </MudPaper>
+    <MudPaper Class="pa-3 rounded-xl" Style="@($"background:{Colors.DeepPurple.Lighten5};")" Width="300px" Height="300px">
+        <div class="d-flex justify-center">
+            <MudImage ObjectFit="ObjectFit.Contain" Height="200" Width="200" Src="img/home/crear-proyecto.svg" Alt="Nuevo Proyecto" Elevation="0" Class="rounded-lg mt-3" />
+        </div>
+        <MudButton Class="mt-3 rounded-xl" Variant="Variant.Filled" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary" IconColor="Color.Inherit" Size="Size.Large" FullWidth="true" OnClick="GoToProjectForm">Crear Proyecto</MudButton>
+    </MudPaper>
+</MudStack>
+
+
+@code{
+    [CascadingParameter]
+    public List<BreadcrumbItem> Routes { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        LoadNavegationRoutes();
+        return base.OnInitializedAsync();
+    }
+    #region navegacion
+    private void LoadNavegationRoutes()
+    {
+        if (!Routes.Exists(x => x.Href!.Equals("/")))
+        {
+            Routes.Add(new BreadcrumbItem(
+                text: "Inicio", href: "/", icon: Icons.Material.Rounded.Home
+            ));
+        }
+        else
+        {
+            var route = Routes.Find(x => x.Href!.Equals("/"));
+            if (route is not null)
+            {
+                var routeIndex = Routes.IndexOf(route);
+                Routes.RemoveRange(routeIndex + 1, (Routes.Count() - routeIndex)-1);
+            }
+        }
+    }
+    #endregion
+    private void GoToProjectForm()
+    {
+        _navigationManager.NavigateTo($"/Projects/projectform/{0}", true, true);
+    }
+    private void GoToProjects()
+    {
+        _navigationManager.NavigateTo("/Projects/projects", true, true);
+    }
+}

@@ -1,0 +1,59 @@
+/* Reset y estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #6B73FF, #000DFF);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estructura principal */
+.container {
+    width: 90%;
+    max-width: 600px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+}
+
+.main-content {
+    text-align: left;
+}
+
+.historial-section h1 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+}
+
+/* Estilo del listado de proyectos */
+.project-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.project-card {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.project-card h2 {
+    font-size: 18px;
+    color: #333;
+}
+
+.project-card p {
+    font-size: 16px;
+    color: #555;
+}

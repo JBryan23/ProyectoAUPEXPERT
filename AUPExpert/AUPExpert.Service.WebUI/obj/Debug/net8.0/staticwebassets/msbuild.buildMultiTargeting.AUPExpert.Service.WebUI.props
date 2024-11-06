@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\AUPExpert.Service.WebUI.props" />
+</Project>
